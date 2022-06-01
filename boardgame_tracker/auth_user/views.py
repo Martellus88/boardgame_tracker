@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.views.generic import CreateView
 
-from boardgame_tracker.auth_user.forms import SignUpForm
+from .forms import SignUpForm
 
 
 class SignUp(CreateView):
