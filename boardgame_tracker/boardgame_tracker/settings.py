@@ -31,6 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'bg_tracker',
+    'auth_user',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
