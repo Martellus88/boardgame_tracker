@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth_user/', include('django.contrib.auth.urls')),
     path('auth_user/', include('auth_user.urls')),
+    path('', include('bg_tracker.urls')),
 ]

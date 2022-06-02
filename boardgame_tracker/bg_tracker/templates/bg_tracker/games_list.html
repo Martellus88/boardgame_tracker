@@ -1,0 +1,15 @@
+{% extends 'bg_tracker/base.html' %}
+
+{% block title %}Game list{% endblock %}
+
+{% block content %}
+    <div class="container mt-3">
+
+        {% for game in games %}
+            <a href="{% url 'game_page' game.slug %}">
+                <img class="img-thumbnail image-sizes" src="{{ game.image }}"
+                     alt="{{ game }}">
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

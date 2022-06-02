@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
+from django.urls import reverse
 
 from auth_user.models import User
 
@@ -15,6 +16,9 @@ class Game(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.game_name)
+
+    def get_absolute_url(self):
+        return reverse('game_page', kwargs={'game_slug': self.slug})
 
     def __str__(self):
         return self.game_name
