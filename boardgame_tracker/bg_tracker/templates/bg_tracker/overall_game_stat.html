@@ -1,0 +1,55 @@
+{% extends "bg_tracker/base.html" %}
+
+{% block title %}{{ self.object.game_name }}-overall game stats{% endblock %}
+
+{% block content %}
+    <div class="container mt-3">
+        <p>
+            <a class="btn btn-primary" href="{% url 'game_page' view.kwargs.game_slug %}">Back</a>
+        </p>
+        <table class="table">
+            <thead class="table-light">
+            <tr>
+                <th class="text-center" colspan="2" scope="col">Global Stats</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="table_border">
+                <td><b>Sum of plated time</b></td>
+                <td>{{ sum_played_time }}</td>
+            </tr>
+            <tr>
+                <td><b>Count of played game</b></td>
+                <td>{{ count_played_game.id__count }}</td>
+            </tr>
+            <tr>
+                <td><b>Count win</b></td>
+                <td>{{ count_win.id__count }}</td>
+            </tr>
+            <tr class="table_border">
+                <td><b>Percent win</b></td>
+                <td>{{ percent_win }}%</td>
+            </tr>
+            <tr>
+                <td><b>Count lose</b></td>
+                <td>{{ count_lose }}</td>
+            </tr>
+            <tr class="table_border">
+                <td><b>Percent lose</b></td>
+                <td>{{ percent_lose }}%</td>
+            </tr>
+            <tr>
+                <td><b>Max score</b></td>
+                <td>{% if best_score.mx %}{{ best_score.mx }}{% else %}0{% endif %}</td>
+            </tr>
+            <tr>
+                <td><b>Min score</b></td>
+                <td>{% if min_score.mn %}{{ min_score.mn }}{% else %}0{% endif %}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+

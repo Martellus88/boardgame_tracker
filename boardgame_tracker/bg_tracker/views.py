@@ -6,7 +6,10 @@ from django.contrib import messages
 
 from .forms import AddPlayerForm, AddGameForm, AddStatisticForm, ScoreSet
 from .models import Game, Score, Statistic, Player
+
 from services.bgg_info import get_bgg_info
+
+from services.overall_stat import StatsFromModels
 
 
 class HomePage(View):
@@ -144,3 +147,33 @@ class GameStatPage(LoginRequiredMixin, DetailView):
         print(stat)
         stat.delete()
         return redirect('game_page', game_slug=self.kwargs.get('game_slug'))
+
+
+class OverallGameStats(LoginRequiredMixin, DetailView):
+    model = Game
+    template_name = 'bg_tracker/overall_game_stat.html'
+    slug_url_kwarg = 'game_slug'
+
+    def get_queryset(self):
+        return Game.objects.filter(user_id=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+
+        overall_game_stat = StatsFromModels(game_slug=self.kwargs['game_slug'],
+                                            user=self.request.user)
+
+        count_win = overall_game_stat.get_count_win()
+        percent_win = overall_game_stat.get_percent_win(count_win=count_win)
+        count_lose = overall_game_stat.get_count_lose(count_win=count_win)
+        percent_lose = overall_game_stat.get_percent_lose(count_lose=count_lose)
+        best_score = overall_game_stat.get_max_score()
+        min_score = overall_game_stat.get_min_score()
+        sum_played_time = overall_game_stat.get_sum_played_times()
+        count_played_game = overall_game_stat.get_count_played_game()
+
+        my_context = {'count_win': count_win, 'percent_win': percent_win, 'count_played_game': count_played_game,
+                      'count_lose': count_lose, 'percent_lose': percent_lose, 'sum_played_time': sum_played_time,
+                      'best_score': best_score, 'min_score': min_score}
+
+        return context | my_context

@@ -8,6 +8,7 @@
     <div class="container">
         <p>
             <a href="{% url 'add_stats' game.slug %}" class="btn btn-primary mt-3">Add new statistic</a>
+            <a href="{% url 'overall_game_stats' game.slug %}" class="btn btn-primary mt-3">Overall game stats</a>
         </p>
         <div class="row">
             {% for stat in game_stat %}

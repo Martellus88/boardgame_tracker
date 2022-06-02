@@ -12,4 +12,5 @@ urlpatterns = [
     path('game/<slug:game_slug>/add-stats/', views.AddStats.as_view(), name='add_stats'),
     path('game/<slug:game_slug>/statistic/<int:stat_id>/add-score/', views.AddScore.as_view(), name='add_score'),
     path('game/<slug:game_slug>/statistic/<int:stat_id>/', views.GameStatPage.as_view(), name='game_stat'),
+    path('overall-game-stats/<slug:game_slug>/', views.OverallGameStats.as_view(), name='overall_game_stats')
 ]
