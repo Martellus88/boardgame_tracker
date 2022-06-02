@@ -16,6 +16,7 @@ class Game(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.game_name)
+        return super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('game_page', kwargs={'game_slug': self.slug})
