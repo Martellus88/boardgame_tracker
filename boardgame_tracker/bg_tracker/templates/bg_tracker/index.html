@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Main page{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h3>
+            Hello! Here you can keep a history of played games and track statistics for each game. Search for games will
+            be
+            entered in the BoardGameGeek database, by the <b>full name</b> of the game.
+        </h3>
+        {% if not user.is_authenticated %}
+            <h3><a class="pt-3 inline-block" href="{% url 'auth_user:register' %}">Registration</a> is required to use
+                this service.</h3>
+        {% endif %}
+    </div>
+{% endblock %}
