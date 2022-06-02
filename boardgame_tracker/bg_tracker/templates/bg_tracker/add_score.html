@@ -1,0 +1,11 @@
+{% extends 'bg_tracker/base.html' %}
+
+{% block content %}
+    <div class="container mt-3 mb-3">
+        <form class="row g-3" method="post">
+            {% csrf_token %}
+                <div class="form-control">{{ form.as_p }}</div>
+            <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+{% endblock %}

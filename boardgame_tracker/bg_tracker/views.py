@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
 
-from .forms import AddPlayerForm, AddGameForm
+from .forms import AddPlayerForm, AddGameForm, AddStatisticForm, ScoreSet
 from .models import Game, Score, Statistic, Player
 from services.bgg_info import get_bgg_info
 
@@ -75,3 +75,46 @@ class AddGame(LoginRequiredMixin, View):
                 form.cleaned_data['image'] = game_img
                 form.save()
                 return redirect('game_list')
+
+
+class AddStats(LoginRequiredMixin, CreateView):
+    model = Statistic
+    form_class = AddStatisticForm
+    template_name = 'bg_tracker/add_stats.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.cleaned_data['game'] = Game.objects.get(slug=self.kwargs.get('game_slug'))
+        form.cleaned_data['user_id'] = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('add_score', kwargs={'game_slug': self.kwargs.get('game_slug'),
+                                                 'stats_id': Statistic.objects.last().id})
+
+
+class AddScore(LoginRequiredMixin, View):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._last_stat = Statistic.objects.last()
+        self._last_stat_player_count = self._last_stat.players.count()
+
+    def get(self, request, **kwargs):
+        score_form = ScoreSet(form_kwargs={'last_stat': self._last_stat},
+                              extra=self._last_stat_player_count)
+        return render(request, 'bg_tracker/add_score.html', {'form': score_form})
+
+    def post(self, request, **kwargs):
+        score_form = ScoreSet(request.POST, form_kwargs={'last_stat': self._last_stat},
+                              extra=self._last_stat_player_count)
+        if score_form.is_valid():
+            last_stat_id = Statistic.objects.last().id
+            for score in score_form.cleaned_data:
+                score.update({'stats_id': last_stat_id})
+            score_form.save()
+        return redirect('game_page', game_slug=self.kwargs.get('game_slug'))
