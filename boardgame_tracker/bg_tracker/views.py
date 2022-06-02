@@ -32,6 +32,12 @@ class GamePage(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return Game.objects.filter(user_id=self.request.user)
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        game_stat = self.object.game_stat.all().filter(user_id=self.request.user)
+        my_context = {'game': self.object, 'game_stat': game_stat}
+        return context | my_context
+
 
 class AddPlayer(LoginRequiredMixin, CreateView):
     model = Player
@@ -94,7 +100,7 @@ class AddStats(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('add_score', kwargs={'game_slug': self.kwargs.get('game_slug'),
-                                                 'stats_id': Statistic.objects.last().id})
+                                                 'stat_id': Statistic.objects.last().id})
 
 
 class AddScore(LoginRequiredMixin, View):
@@ -117,4 +123,24 @@ class AddScore(LoginRequiredMixin, View):
             for score in score_form.cleaned_data:
                 score.update({'stats_id': last_stat_id})
             score_form.save()
+        return redirect('game_page', game_slug=self.kwargs.get('game_slug'))
+
+
+class GameStatPage(LoginRequiredMixin, DetailView):
+    model = Statistic
+    template_name = 'bg_tracker/game_stat.html'
+    pk_url_kwarg = 'stat_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        scores = Score.objects.filter(stats=self.object)
+        my_context = {'game_stat': self.object, 'scores': scores}
+        return context | my_context
+
+    def post(self, *args, **kwargs):
+        stat_id_ = self.request.POST.get('stat_id')
+        print(stat_id_)
+        stat = Statistic.objects.filter(id=stat_id_)
+        print(stat)
+        stat.delete()
         return redirect('game_page', game_slug=self.kwargs.get('game_slug'))

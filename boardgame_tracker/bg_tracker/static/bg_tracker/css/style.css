@@ -1,0 +1,20 @@
+.text-center {
+    text-align: center;
+}
+
+.image-sizes {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.table_border {
+    border-bottom: 1px solid black;
+}
+
+.float-right {
+    float: right;
+}
+
+.inline-block {
+    display: inline-block;
+}

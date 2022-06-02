@@ -1,0 +1,47 @@
+{% extends 'bg_tracker/base.html' %}
+
+{% block title %}{{ game_stat.name }}{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-3">
+        <p>
+            <a class="btn btn-primary" href="{% url 'game_page' view.kwargs.game_slug %}">Back</a>
+        </p>
+        <hr>
+            <div class="col-sm-6">
+                <h5>{{ game_stat.stats_name }}, {{ game_stat.game_date }}</h5>
+                <p><b>Duration:</b> {{ game_stat.duration|time:"H:i" }}</p>
+
+                <table class="table">
+                    <thead class="table-light">
+                    <tr>
+                        <th scope="col">Player</th>
+                        <th scope="col">Score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for score in scores %}
+                        <tr>
+                            <td>{{ score.player }}</td>
+                            <td>{{ score.score }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+
+                <p><b>Winner:</b> {{ game_stat.winner }}</p>
+                <p><b>Description:</b> {{ game_stat.comments }}</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" name="stat_id" value="{{ game_stat.pk }}">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+{% endblock %}

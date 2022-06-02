@@ -6,7 +6,23 @@
 {% block content %}
 
     <div class="container">
-        {{ object }}
+        <p>
+            <a href="{% url 'add_stats' game.slug %}" class="btn btn-primary mt-3">Add new statistic</a>
+        </p>
+        <div class="row">
+            {% for stat in game_stat %}
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title inline-block">{{ stat.game_date }}, {{ stat.stats_name }}</h5>
+                            <a href="{% url 'game_stat' game.slug stat.pk %}" class="btn btn-primary btn-sm float-right">
+                                More info
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}
