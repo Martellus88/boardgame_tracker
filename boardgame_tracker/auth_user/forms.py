@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from services.queries import get_first_instance, create_user
+
 User = get_user_model()
 
 
@@ -21,7 +23,7 @@ class SignUpForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
-        if User.objects.filter(email=email).first():
+        if get_first_instance(model=User, email=email) is not None:
             raise ValidationError(
                 self.email_exists_error['email_exists'],
                 code='email_exists'
@@ -31,7 +33,5 @@ class SignUpForm(UserCreationForm):
     def save(self, commit=True):
         username, email, password = self.cleaned_data.get('username'), self.cleaned_data.get(
             'email'), self.cleaned_data.get('password1')
-        user = User(username=username, email=email)
-        user.set_password(password)
-        user.save()
+        user = create_user(password=password, username=username, email=email)
         return user

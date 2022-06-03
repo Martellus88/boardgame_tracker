@@ -4,6 +4,7 @@ from django.views.generic import CreateView
 
 from .forms import SignUpForm
 from bg_tracker.models import Player
+from services.queries import create_model_instance
 
 
 class SignUp(CreateView):
@@ -12,6 +13,6 @@ class SignUp(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        Player.objects.create(username=form.cleaned_data['username'], user_friend=user)
+        create_model_instance(Player, username=form.cleaned_data['username'], user_friend=user)
         login(self.request, user)
         return redirect('home')
