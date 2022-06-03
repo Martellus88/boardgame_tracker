@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView
 
 from .forms import SignUpForm
+from bg_tracker.models import Player
 
 
 class SignUp(CreateView):
@@ -11,5 +12,6 @@ class SignUp(CreateView):
 
     def form_valid(self, form):
         user = form.save()
+        Player.objects.create(username=form.cleaned_data['username'], user_friend=user)
         login(self.request, user)
         return redirect('home')
