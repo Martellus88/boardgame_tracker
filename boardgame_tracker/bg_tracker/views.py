@@ -84,6 +84,7 @@ class AddGame(LoginRequiredMixin, View):
                 form.cleaned_data['image'] = game_img
                 form.save()
                 return redirect('game_list')
+        return redirect('home')  # TODO
 
 
 class AddStats(LoginRequiredMixin, CreateView):
@@ -142,9 +143,7 @@ class GameStatPage(LoginRequiredMixin, DetailView):
 
     def post(self, *args, **kwargs):
         stat_id_ = self.request.POST.get('stat_id')
-        print(stat_id_)
         stat = Statistic.objects.filter(id=stat_id_)
-        print(stat)
         stat.delete()
         return redirect('game_page', game_slug=self.kwargs.get('game_slug'))
 
