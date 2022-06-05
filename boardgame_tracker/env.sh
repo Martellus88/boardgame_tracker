@@ -1,0 +1,7 @@
+export SECRET_KEY=''
+export DEBUG=''
+export EMAIL_HOST=''
+export EMAIL_PORT=''
+export EMAIL_USE_TLS=''
+export EMAIL_HOST_USER=''
+export EMAIL_HOST_PASSWORD=''
