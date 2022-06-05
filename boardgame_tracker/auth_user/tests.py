@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from services.queries import create_and_save_user
+from services.queries import create_user
 
 User = get_user_model()
 
@@ -10,7 +10,7 @@ User = get_user_model()
 class TestAuthUserClient(TestCase):
 
     def setUp(self):
-        self.bob = create_and_save_user(password='123', username='bob', email='bob@ex.com')
+        self.bob = create_user(password='123', username='bob', email='bob@ex.com')
 
     def tearDown(self):
         self.bob.delete()
