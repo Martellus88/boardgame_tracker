@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, View, CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +14,8 @@ from services.queries import get_game_stat, instance_get, get_last_instance_id, 
     delete_instance, game_added_by_user, game_exists_in_db, add_game_to_user, filter_model_or_qs
 from services.overall_stat import StatsFromModels
 
+logger = logging.getLogger(__name__)
+
 
 class HomePage(View):
     def get(self, request):
@@ -23,7 +27,6 @@ class GameList(LoginRequiredMixin, ListView):
     template_name = 'bg_tracker/games_list.html'
     context_object_name = 'games'
 
-    # TODO ?!
     def get_queryset(self):
         return filter_model_or_qs(Game, user_id=self.request.user).values('image', 'slug')
 
@@ -86,8 +89,13 @@ class AddGame(LoginRequiredMixin, View):
                 return redirect('game_list')
             try:
                 game_img = get_bgg_info(game_name)
-            except KeyError:
+            except KeyError as e:
+                logger.warning(f'{type(e)}, {e}; game_name: {game_name}')
                 messages.error(self.request, 'The name of the game is incorrect or the game does not exist')
+                return redirect('add_game')
+            except Exception as e:
+                logger.warning(f'{type(e)}, {e}; game_name: {game_name}')
+                messages.error(self.request, 'An error has occurred on the BoardGameGeek side')
                 return redirect('add_game')
             else:
                 form.cleaned_data['user_id'] = self.request.user

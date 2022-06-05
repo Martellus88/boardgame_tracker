@@ -136,3 +136,28 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() in \
                 ['true', 'on', '1']
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'bg_tracker_formatter': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log.log'),
+            'formatter': 'bg_tracker_formatter'
+        },
+    },
+    'loggers': {
+        'bg_tracker': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+        },
+    },
+}
