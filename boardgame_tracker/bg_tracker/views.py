@@ -23,8 +23,9 @@ class GameList(LoginRequiredMixin, ListView):
     template_name = 'bg_tracker/games_list.html'
     context_object_name = 'games'
 
+    # TODO ?!
     def get_queryset(self):
-        return filter_model_or_qs(Game, user_id=self.request.user)
+        return filter_model_or_qs(Game, user_id=self.request.user).values('image', 'slug')
 
 
 class GamePage(LoginRequiredMixin, DetailView):
@@ -37,7 +38,8 @@ class GamePage(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        game_stat = filter_model_or_qs(get_game_stat(self.object), user_id=self.request.user)
+        game_stat = filter_model_or_qs(get_game_stat(self.object), user_id=self.request.user).values('pk', 'game_date',
+                                                                                                     'stats_name')
         my_context = {'game': self.object, 'game_stat': game_stat}
         return context | my_context
 
@@ -143,7 +145,7 @@ class GameStatPage(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        scores = filter_model_or_qs(Score, stats=self.object)
+        scores = filter_model_or_qs(Score, stats=self.object).select_related('player')
         my_context = {'game_stat': self.object, 'scores': scores}
         return context | my_context
 
@@ -159,7 +161,7 @@ class OverallGameStats(LoginRequiredMixin, DetailView):
     slug_url_kwarg = 'game_slug'
 
     def get_queryset(self):
-        return filter_model_or_qs(Game, user_id=self.request.user)
+        return filter_model_or_qs(Game, user_id=self.request.user).values('slug')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
