@@ -4,8 +4,9 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils import timezone
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-from auth_user.models import User
+User = get_user_model()
 
 
 class Game(models.Model):

@@ -2,6 +2,8 @@ from django import forms
 from django.forms import BaseModelFormSet, modelformset_factory
 
 from .models import Player, Statistic, Game, Score
+from services.queries import create_model_instance, get_players_from_stat, add_players_in_stats, \
+    add_user_in_game_set, filter_model_or_qs
 
 
 class AddPlayerForm(forms.ModelForm):
@@ -10,21 +12,17 @@ class AddPlayerForm(forms.ModelForm):
         fields = ['username']
 
     def save(self, commit=True):
-        player = Player(**self.cleaned_data)
-        player.save()
+        player = create_model_instance(Player, **self.cleaned_data)
         return player
 
 
-class AddGameForm(forms.ModelForm):
-    class Meta:
-        model = Game
-        fields = ['game_name']
+class AddGameForm(forms.Form):
+    game_name = forms.CharField(max_length=255)
 
-    def save(self, commit=True):
+    def save(self):
         user = self.cleaned_data.pop('user_id')
-        game = Game(**self.cleaned_data)
-        game.save()
-        game.user_id.add(user)
+        game = create_model_instance(Game, **self.cleaned_data)
+        add_user_in_game_set(game, user=user)
 
 
 class AddStatisticForm(forms.ModelForm):
@@ -40,19 +38,15 @@ class AddStatisticForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-
-        choices_fields_queryset = Player.objects.filter(user_friend=user)
+        choices_fields_queryset = filter_model_or_qs(Player, user_friend=user)
         self.fields['players'].queryset = choices_fields_queryset
         self.fields['winner'].queryset = choices_fields_queryset
 
     def save(self, commit=True):
         players = self.cleaned_data.pop('players')
         players_id = [player.id for player in players]
-
-        stats = Statistic(**self.cleaned_data)
-        stats.save()
-
-        stats.players.add(*players_id)
+        stats = create_model_instance(Statistic, **self.cleaned_data)
+        add_players_in_stats(stats, *players_id)
         return stats
 
 
@@ -64,12 +58,10 @@ class ScoreForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self._last_stat = kwargs.pop('last_stat')
         super().__init__(*args, **kwargs)
-
-        self.fields['player'].queryset = self._last_stat.players.all()
+        self.fields['player'].queryset = get_players_from_stat(self._last_stat)
 
     def save(self, commit=True):
-        score = Score(**self.cleaned_data)
-        score.save()
+        score = create_model_instance(Score, **self.cleaned_data)
         return score
 
 

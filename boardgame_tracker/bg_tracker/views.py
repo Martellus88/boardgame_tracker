@@ -8,13 +8,12 @@ from .forms import AddPlayerForm, AddGameForm, AddStatisticForm, ScoreSet
 from .models import Game, Score, Statistic, Player
 
 from services.bgg_info import get_bgg_info
-from services.queries import filter_model, get_game_stat, instance_get, get_last_instance_id, get_last, \
-    get_count_players_in_stat, delete_instance, game_added_by_user, game_exists_in_db, add_game_to_user
+from services.queries import get_game_stat, instance_get, get_last_instance_id, get_last, get_count_players_in_stat, \
+    delete_instance, game_added_by_user, game_exists_in_db, add_game_to_user, filter_model_or_qs
 from services.overall_stat import StatsFromModels
 
 
 class HomePage(View):
-
     def get(self, request):
         return render(request, 'bg_tracker/index.html')
 
@@ -25,7 +24,7 @@ class GameList(LoginRequiredMixin, ListView):
     context_object_name = 'games'
 
     def get_queryset(self):
-        return filter_model(Game, user_id=self.request.user)
+        return filter_model_or_qs(Game, user_id=self.request.user)
 
 
 class GamePage(LoginRequiredMixin, DetailView):
@@ -34,11 +33,11 @@ class GamePage(LoginRequiredMixin, DetailView):
     slug_url_kwarg = 'game_slug'
 
     def get_queryset(self):
-        return filter_model(Game, user_id=self.request.user)
+        return filter_model_or_qs(Game, user_id=self.request.user)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        game_stat = filter_model(get_game_stat(self.object), user_id=self.request.user)
+        game_stat = filter_model_or_qs(get_game_stat(self.object), user_id=self.request.user)
         my_context = {'game': self.object, 'game_stat': game_stat}
         return context | my_context
 
@@ -62,7 +61,7 @@ class PlayersList(LoginRequiredMixin, ListView):
     context_object_name = 'players'
 
     def get_queryset(self):
-        return filter_model(Player, user_friend=self.request.user)
+        return filter_model_or_qs(Player, user_friend=self.request.user)
 
 
 class AddGame(LoginRequiredMixin, View):
@@ -77,25 +76,22 @@ class AddGame(LoginRequiredMixin, View):
             game_name = form.cleaned_data['game_name']
 
             if game_added_by_user(game_name, self.request.user):
-                messages.info(self.request, 'The game has already been added to your collection.')
                 return redirect('game_list')
 
             game = game_exists_in_db(game_name)
             if game is not None:
                 add_game_to_user(game, self.request.user)
                 return redirect('game_list')
+            try:
+                game_img = get_bgg_info(game_name)
+            except KeyError:
+                messages.error(self.request, 'The name of the game is incorrect or the game does not exist')
+                return redirect('add_game')
             else:
-                try:
-                    game_img = get_bgg_info(game_name)
-                except KeyError:
-                    messages.error(self.request, 'The name of the game is incorrect or the game does not exist')
-                    return redirect('add_game')
-                else:
-                    form.cleaned_data['user_id'] = self.request.user
-                    form.cleaned_data['image'] = game_img
-                    form.save()
-                    return redirect('game_list')
-        return redirect('home')  # TODO
+                form.cleaned_data['user_id'] = self.request.user
+                form.cleaned_data['image'] = game_img
+                form.save()
+                return redirect('game_list')
 
 
 class AddStats(LoginRequiredMixin, CreateView):
@@ -119,7 +115,6 @@ class AddStats(LoginRequiredMixin, CreateView):
 
 
 class AddScore(LoginRequiredMixin, View):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._last_stat = get_last(Statistic)
@@ -148,7 +143,7 @@ class GameStatPage(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        scores = filter_model(Score, stats=self.object)
+        scores = filter_model_or_qs(Score, stats=self.object)
         my_context = {'game_stat': self.object, 'scores': scores}
         return context | my_context
 
@@ -164,14 +159,12 @@ class OverallGameStats(LoginRequiredMixin, DetailView):
     slug_url_kwarg = 'game_slug'
 
     def get_queryset(self):
-        return filter_model(Game, user_id=self.request.user)
+        return filter_model_or_qs(Game, user_id=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-
         overall_game_stat = StatsFromModels(game_slug=self.kwargs['game_slug'],
                                             user=self.request.user)
-
         count_win = overall_game_stat.get_count_win()
         percent_win = overall_game_stat.get_percent_win(count_win=count_win)
         count_lose = overall_game_stat.get_count_lose(count_win=count_win)

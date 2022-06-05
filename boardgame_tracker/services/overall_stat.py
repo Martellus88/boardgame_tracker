@@ -1,4 +1,5 @@
 from django.db.models import Max, Min, Count, Q
+from django.shortcuts import get_object_or_404
 
 from bg_tracker.models import Statistic, Player, Score
 
@@ -6,8 +7,8 @@ from bg_tracker.models import Statistic, Player, Score
 class StatsFromModels:
     def __init__(self, game_slug, user):
         self._played_game = Statistic.objects.filter(game__slug=game_slug)
-        self._user_player = Player.objects.get(
-            Q(username__contains=user.username) & Q(user_friend=user.pk))
+        self._user_player = get_object_or_404(Player,
+                                              Q(username__contains=user.username) & Q(user_friend=user.pk))
         self._scores = Score.objects.filter(stats__in=self._played_game)
         self._count_played_game = self._played_game.filter(players=self._user_player).aggregate(Count('id'))
 

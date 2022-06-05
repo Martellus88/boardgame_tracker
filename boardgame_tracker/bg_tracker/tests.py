@@ -66,11 +66,11 @@ class BgTrackerTests(TestCase):
 
         # if game exists for DB, not user
         resp = self.client.post(reverse('add_game'), {'game_name': 'eldritch horror'}, follow=True)
-        self.assertTemplateUsed(resp, 'bg_tracker/add_game.html')
+        self.assertTemplateUsed(resp, 'bg_tracker/games_list.html')
 
         # if new game
         resp = self.client.post(reverse('add_game'), {'game_name': 'War of the Ring: Second Edition '}, follow=True)
-        self.assertTemplateUsed(resp, 'bg_tracker/game_list.html')
+        self.assertTemplateUsed(resp, 'bg_tracker/games_list.html')
 
         # if game_name incorrect
         resp = self.client.post(reverse('add_game'), {'game_name': 'asdasqw'}, follow=True)
