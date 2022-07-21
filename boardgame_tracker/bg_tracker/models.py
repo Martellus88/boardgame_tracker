@@ -48,6 +48,9 @@ class Statistic(models.Model):
     def __str__(self):
         return f"{self.game_date}-{self.game}: winner - {self.winner}"
 
+    def get_absolute_url(self, game):
+        return reverse('stats-detail', kwargs={'pk': self.id, 'game_slug': game.slug})
+
 
 class Score(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='player')

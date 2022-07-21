@@ -19,6 +19,10 @@ def filter_model_or_qs(model_or_qs, **fields):
     return model_or_qs.objects.filter(**fields)
 
 
+def filter_game_stat(game, **fields):
+    return game.game_stat.filter(**fields)
+
+
 def get_game_stat(instance_game):
     return instance_game.game_stat.all()
 
@@ -79,3 +83,11 @@ def add_players_in_stats(instance_stat, *players):
 
 def add_user_in_game_set(instance_game, user):
     instance_game.user_id.add(user)
+
+
+def remove_user_from_game_set(instance_user, game):
+    instance_user.game_set.remove(game)
+
+
+def players_list_from_stat(instance_stat):
+    return [player.username for player in instance_stat.players.all()]
