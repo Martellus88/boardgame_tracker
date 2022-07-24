@@ -136,8 +136,8 @@ class StatsAPIViewTestCase(APITestCase):
             'game_date': f'{datetime.date(2022, 6, 4)}',
             'duration': f'{datetime.time(1, 2, 30)}',
             'comments': 'fine',
-            'winner': 1,
-            'players': [1, 2]
+            'winner': {'username': 'bob'},
+            'players': [{'username': 'bob'}, {'username': 'john'}]
         }
         json_data = json.dumps(data)
 

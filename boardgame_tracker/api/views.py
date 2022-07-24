@@ -28,6 +28,9 @@ class StatsAPIView(mixins.CreateModelMixin,
 
     def perform_create(self, serializer):
         serializer.validated_data['game'] = instance_get(Game, slug=self.kwargs.get('game_slug'))
+        serializer.validated_data['players'] = [instance_get(Player, **player) for player in
+                                                serializer.validated_data['players']]
+        serializer.validated_data['winner'] = instance_get(Player, **serializer.validated_data['winner'])
         serializer.save()
 
 

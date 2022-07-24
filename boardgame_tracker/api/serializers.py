@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from bg_tracker.models import Game, Player, Statistic, Score
-from services.queries import filter_model_or_qs, create_model_instance, filter_game_stat
+from services.queries import filter_model_or_qs, create_model_instance, filter_game_stat, add_players_in_stats
 
 
 class PlayerSerializer(ModelSerializer):
@@ -39,6 +39,12 @@ class StatsSerializer(ModelSerializer):
     def get_score(self, stat):
         scores = filter_model_or_qs(Score, stats=stat)
         return [ScoreSerializer(score).data for score in scores]
+
+    def create(self, validated_data):
+        players = validated_data.pop('players')
+        stat = create_model_instance(Statistic, **validated_data)
+        add_players_in_stats(stat, *players)
+        return stat
 
 
 class GameSerializer(serializers.Serializer):
