@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import generics, mixins
 from rest_framework.response import Response
 
-from api.permissions import IsOwner
+from api.permissions import IsOwnerStatistic
 from api.serializers import GameSerializer, PlayerSerializer, StatsSerializer, GameRetrieveSerializer, ScoreSerializer
 from bg_tracker.models import Game, Player, Statistic
 from services.overall_stat import StatsFromModels
@@ -21,7 +21,7 @@ class StatsAPIView(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
     serializer_class = StatsSerializer
-    permission_classes = (IsOwner,)
+    permission_classes = (IsOwnerStatistic,)
 
     def get_queryset(self):
         return filter_model_or_qs(Statistic, game__slug=self.kwargs.get('game_slug'), user_id=self.request.user)
@@ -77,7 +77,7 @@ class PayerAPIView(generics.ListCreateAPIView):
 
 class ScoreAPIView(generics.CreateAPIView):
     serializer_class = ScoreSerializer
-    permission_classes = (IsOwner,)
+    permission_classes = (IsOwnerStatistic,)
 
 
 class OverallGameStatAPIView(APIView):

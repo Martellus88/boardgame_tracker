@@ -8,9 +8,10 @@ from services.queries import instance_get
 logger = logging.getLogger(__name__)
 
 
-class IsOwner(permissions.BasePermission):
-
+class IsOwnerStatistic(permissions.BasePermission):
     def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         if request.resolver_match.url_name in ('score', 'stats-detail'):
             stat_id = request.resolver_match.kwargs.get('pk')
             try:

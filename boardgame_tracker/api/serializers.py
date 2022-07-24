@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from bg_tracker.models import Game, Player, Statistic, Score
-from services.queries import filter_model_or_qs, create_model_instance, players_list_from_stat, filter_game_stat
+from services.queries import filter_model_or_qs, create_model_instance, filter_game_stat
 
 
 class PlayerSerializer(ModelSerializer):
@@ -29,6 +29,8 @@ class ScoreSerializer(ModelSerializer):
 class StatsSerializer(ModelSerializer):
     user_id = serializers.HiddenField(default=serializers.CurrentUserDefault())
     scores = serializers.SerializerMethodField('get_score', read_only=True)
+    players = PlayerSerializer(many=True)
+    winner = PlayerSerializer()
 
     class Meta:
         model = Statistic
@@ -37,12 +39,6 @@ class StatsSerializer(ModelSerializer):
     def get_score(self, stat):
         scores = filter_model_or_qs(Score, stats=stat)
         return [ScoreSerializer(score).data for score in scores]
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['players'] = players_list_from_stat(instance)
-        response['winner'] = instance.winner.username
-        return response
 
 
 class GameSerializer(serializers.Serializer):

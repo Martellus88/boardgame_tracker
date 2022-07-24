@@ -87,7 +87,3 @@ def add_user_in_game_set(instance_game, user):
 
 def remove_user_from_game_set(instance_user, game):
     instance_user.game_set.remove(game)
-
-
-def players_list_from_stat(instance_stat):
-    return [player.username for player in instance_stat.players.all()]
