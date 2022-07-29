@@ -21,7 +21,7 @@ class StatsAPIView(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
     serializer_class = StatsSerializer
-    permission_classes = (IsOwnerStatistic,)
+    permission_classes = (IsOwner,)
 
     def get_queryset(self):
         return filter_model_or_qs(Statistic, game__slug=self.kwargs.get('game_slug'), user_id=self.request.user)
