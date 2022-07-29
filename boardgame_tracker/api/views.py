@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import generics, mixins
 from rest_framework.response import Response
 
-from api.permissions import IsOwnerStatistic
+from api.permissions import IsOwnerStatistic, IsOwner
 from api.serializers import GameSerializer, PlayerSerializer, StatsSerializer, GameRetrieveSerializer, ScoreSerializer
 from bg_tracker.models import Game, Player, Statistic
 from services.overall_stat import StatsFromModels

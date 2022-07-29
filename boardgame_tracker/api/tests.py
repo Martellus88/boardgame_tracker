@@ -170,13 +170,13 @@ class StatsAPIViewTestCase(APITestCase):
         self.client.force_login(self.user_2)
         url = reverse('stats-detail', kwargs={'game_slug': 'catan', 'pk': 1})
         response = self.client.delete(url)
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_destroy_now_owner(self):
         self.client.force_login(self.user_2)
         url = reverse('stats-detail', kwargs={'game_slug': 'catan', 'pk': 1})
         response = self.client.delete(url)
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(Statistic.objects.count(), 2)
 
 
